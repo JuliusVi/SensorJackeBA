@@ -66,8 +66,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/sendTimeBtn"
-            android:text="Timestamp"/>
+            android:id="@+id/reqDownloadBtn"
+            android:text="Datei Laden"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -136,10 +136,15 @@ public class Cube {
         //Matrix.setIdentityM(modelMatrix, 0);
         Matrix.translateM(modelMatrix,0, posX, posY, posZ);
 
+        //Matrix.rotateM(modelMatrix, 0, rotX,1,0,0);
         Matrix.rotateM(modelMatrix,0,rotY, 0, 1, 0);
         //Matrix.rotateM(modelMatrix,0,rotX, 1, 0, 0);
         Matrix.rotateM(modelMatrix,0,rotZ, 0, 0, 1);
-        Matrix.rotateM(modelMatrix,0,rotX, 1, 0, 0);
+        //Matrix.rotateM(modelMatrix,0,rotX, 1, 0, 0);
+
+        //float[] rotation = {}
+
+        //Matrix.multiplyMM(modelMatrix,0,);
 
         Matrix.scaleM(modelMatrix,0, x, y, z);
 

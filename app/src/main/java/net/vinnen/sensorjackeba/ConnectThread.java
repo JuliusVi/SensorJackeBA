@@ -2,11 +2,14 @@ package net.vinnen.sensorjackeba;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,6 +26,7 @@ public class ConnectThread extends Thread {
     private final BluetoothDevice mmDevice;
     private final String TAG = "ConnectThread";
 
+    File dataDir = new File(Environment.getExternalStorageDirectory(), "trackerJacketData");
     BufferedWriter bWrite;
 
     private MainActivity context;
@@ -85,25 +89,50 @@ public class ConnectThread extends Thread {
 
         Log.d(TAG,"running");
 
+        sendString("t" + System.currentTimeMillis() + "s");
+
         String line = "";
         int nextSens=0;
 
         try {
             while (!(line = bRead.readLine()).startsWith("S")) {
-                //if(line.startsWith(""))
-                final String[] parts = line.split(",");
-                int multi = Integer.parseInt(parts[0]);
-                //Log.d(TAG, line);
-                for (int i = 2; i < 5; i++) {
-                    int glob = multi * 4 + (i - 1);
-                    context.valuesToDisplay[glob] = parts[i];
-                }
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        context.updateDisplay();
+                if(line.startsWith("W")){ //Write
+                    Log.d(TAG, "Writing File");
+                    dataDir.mkdirs();
+                    dataDir.mkdir();
+                    File f = new File(dataDir, "tmp");
+                    BufferedWriter bw = null;
+                    try {
+                        f.createNewFile();
+                        FileOutputStream fo = new FileOutputStream(f);
+                        OutputStreamWriter osw = new OutputStreamWriter(fo);
+                        bw = new BufferedWriter(osw);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                });
+                    while (!(line = bRead.readLine()).startsWith("w")) {
+                        Log.d(TAG, line);
+                        bw.write(line);
+                        // bw.write("\n");
+                    }
+                    Log.d(TAG, "File transmitted");
+                    bw.flush();
+                    bw.close();
+                }else {
+                    final String[] parts = line.split(",");
+                    int multi = Integer.parseInt(parts[0]);
+                    //Log.d(TAG, line);
+                    for (int i = 2; i < 5; i++) {
+                        int glob = multi * 4 + (i - 1);
+                        context.valuesToDisplay[glob] = parts[i];
+                    }
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            context.updateDisplay();
+                        }
+                    });
+                }
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -137,5 +166,9 @@ public class ConnectThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void downloadFile(String fileNumber){
+        sendString("r/output_" + fileNumber + ".txts");
     }
 }

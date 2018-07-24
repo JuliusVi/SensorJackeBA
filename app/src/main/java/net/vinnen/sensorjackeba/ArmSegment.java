@@ -65,8 +65,9 @@ public class ArmSegment {
         //Roll des Vektors ist egal
         //rotateVector(vecX,vecY, vecZ, "X", rotX);
 
-        rotateVector(vecX,vecY, vecZ, "Z", rotZ);
-        rotateVector(vecX,vecY, vecZ, "Y", rotY);
+        rotateVector(vecX,vecY,vecZ, "Z", rotZ);
+        rotateVector(vecX,vecY,vecZ, "Y", rotY);
+        //rotateAllAchses(vecX,vecY,vecZ,rotY,rotX,rotZ);
 
         endX = posX + vecX;
         endY = posY + vecY;
@@ -92,5 +93,20 @@ public class ArmSegment {
         vecZ =  (float)( w*(u*x + v*y + w*z)*(1d - Math.cos(Math.toRadians(deg)))
                 + z*Math.cos(Math.toRadians(deg))
                 + (-v*x + u*y)*Math.sin(Math.toRadians(deg)));
+    }
+
+    //vecX = x*(cos(yaw)*cos(pitch) + y*(cos(yaw)*sin(pitch)*sin(roll)- sin(yaw)*cos(roll)) + z*
+    //vecX = x*(cos(yaw)*cos(pitch)) + y*(sin(yaw)*cos(pitch)) - z*(sin(pitch))
+    //vecY = x*(cos(yaw)*sin(pitch)*sin(roll)- sin(yaw)*cos(roll)) + y*(sin(yaw)*sin(pitch)*sin(roll)+ cos(yaw)*cos(roll)) + z*(cos(pitch)*sin(roll))
+    //vecZ = x*(cos(yaw)*sin(pitch)*cos(roll)+ sin(yaw)*sin(roll)) + y*(sin(yaw)*sin(pitch)*cos(roll)- cos(yaw)*sin(roll)) + z*(cos(pitch)*cos(roll))
+    public void rotateAllAchses(double x, double y, double z, double yawDeg, double pitchDeg ,double rollDeg){
+        double yaw, pitch, roll;
+        yaw = Math.toRadians(yawDeg);
+        pitch = Math.toRadians(pitchDeg);
+        roll = Math.toRadians(rollDeg);
+
+        vecX = (float) (x*(Math.cos(yaw)*Math.cos(pitch)) + y*(Math.sin(yaw)*Math.cos(pitch)) - z*(Math.sin(pitch)));
+        vecY = (float) (x*(Math.cos(yaw)*Math.sin(pitch)*Math.sin(roll)- Math.sin(yaw)*Math.cos(roll)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.sin(roll)+ Math.cos(yaw)*Math.cos(roll)) + z*(Math.cos(pitch)*Math.sin(roll)));
+        vecZ = (float) (x*(Math.cos(yaw)*Math.sin(pitch)*Math.cos(roll)+ Math.sin(yaw)*Math.sin(roll)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.cos(roll)- Math.cos(yaw)*Math.sin(roll)) + z*(Math.cos(pitch)*Math.cos(roll)));
     }
 }

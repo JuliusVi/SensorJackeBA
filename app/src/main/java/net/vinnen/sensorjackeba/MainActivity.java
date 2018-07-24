@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity
     public ArmSegment lRA = new ArmSegment(0,0,0,0.065f,0.3f,0.065f,0,0,0);
 
     private TextureView mTextureView;
-    Camera mCamera;
     Canvas pic;
 
     ConnectThread connectThread;
@@ -86,11 +85,11 @@ public class MainActivity extends AppCompatActivity
 
         mTextureView.setSurfaceTextureListener(this);
 
-        final Button sendTime = (Button)findViewById(R.id.sendTimeBtn);
-        sendTime.setOnClickListener(new View.OnClickListener() {
+        final Button reqDownload = (Button)findViewById(R.id.reqDownloadBtn);
+        reqDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                connectThread.sendString("t" + System.currentTimeMillis() + "s");
+                DownloadDialog d = new DownloadDialog(MainActivity.this,connectThread);
             }
         });
 
@@ -142,17 +141,6 @@ public class MainActivity extends AppCompatActivity
         //Stuff for Looks
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -284,16 +272,6 @@ public class MainActivity extends AppCompatActivity
         // in the onDrawFrame() method
         Matrix.frustumM(rendererThread.mProjectionMatrix, 0, -ratio, ratio, -1, 1, 0.8f, 3);
 
-        /*
-        mCamera = Camera.open();
-
-        try {
-            mCamera.setPreviewTexture(surface);
-            mCamera.startPreview();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
         //pic = mTextureView.lockCanvas();
         //pic.drawCircle(50,50,50, green);
         //mTextureView.unlockCanvasAndPost(pic);
