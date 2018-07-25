@@ -42,25 +42,29 @@
                 android:src="@drawable/ic_skip_previous_black_24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:onClick="onPreviousPressed"/>
             <ImageButton
                 android:id="@+id/play"
                 android:src="@drawable/ic_play_arrow_black_24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:onClick="onPlayPressed"/>
             <ImageButton
                 android:id="@+id/forward"
                 android:src="@drawable/ic_skip_next_black_24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:onClick="onNextPressed"/>
             <ImageButton
                 android:id="@+id/live"
                 android:src="@drawable/ic_sync_black_24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:onClick="onLivePressed"/>
         </LinearLayout>
 
         <Button

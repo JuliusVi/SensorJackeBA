@@ -22,6 +22,7 @@ import java.util.UUID;
  */
 
 public class ConnectThread extends Thread {
+    public static boolean live = true;
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private final String TAG = "ConnectThread";
@@ -113,25 +114,27 @@ public class ConnectThread extends Thread {
                     while (!(line = bRead.readLine()).startsWith("w")) {
                         Log.d(TAG, line);
                         bw.write(line);
-                        // bw.write("\n");
+                        bw.write("\n");
                     }
                     Log.d(TAG, "File transmitted");
                     bw.flush();
                     bw.close();
                 }else {
-                    final String[] parts = line.split(",");
-                    int multi = Integer.parseInt(parts[0]);
-                    //Log.d(TAG, line);
-                    for (int i = 2; i < 5; i++) {
-                        int glob = multi * 4 + (i - 1);
-                        context.valuesToDisplay[glob] = parts[i];
-                    }
-                    context.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            context.updateDisplay();
+                    if(live) {
+                        final String[] parts = line.split(",");
+                        int multi = Integer.parseInt(parts[0]);
+                        //Log.d(TAG, line);
+                        for (int i = 2; i < 5; i++) {
+                            int glob = multi * 4 + (i - 1);
+                            context.valuesToDisplay[glob] = parts[i];
                         }
-                    });
+                        context.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.updateDisplay();
+                            }
+                        });
+                    }
                 }
             }
         }catch(Exception e){

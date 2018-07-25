@@ -3,6 +3,7 @@ package net.vinnen.sensorjackeba;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,8 +12,10 @@ import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TextureView.SurfaceTextureListener {
 
     public static final String TAG = "ConnectThread";
+    private FilePlayer player;
 
     public ArmSegment uLA = new ArmSegment(0.15f,1.6f,-0.1f,0.065f,0.3f,0.065f,0,0,-90);
     public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,-0.1f,0.065f,0.3f,0.065f ,0, 0, 0);
@@ -150,6 +154,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        String fileToPlay = getIntent().getStringExtra("PlayFile");
+        if(fileToPlay != null && fileToPlay != ""){
+            playFile(fileToPlay);
+        }
     }
 
     @Override
@@ -200,6 +209,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
             Intent openFilesActivity = new Intent(this, SelectFile.class);
             startActivity(openFilesActivity);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -213,7 +223,11 @@ public class MainActivity extends AppCompatActivity
     public void updateDisplay(){
         for (int i = 0; i < valuesToDisplay.length; i++) {
             if(i%4 != 0){
-                values[i] = Double.parseDouble(valuesToDisplay[i]);
+                try {
+                    values[i] = Double.parseDouble(valuesToDisplay[i]);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 //valuesToDisplay[i] = String.valueOf(values[i]).split(",")[0];
             }
             if(i%4 == 0){
@@ -297,10 +311,55 @@ public class MainActivity extends AppCompatActivity
         //mTextureView.unlockCanvasAndPost(pic);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+        if(p.getBoolean("show_debug", true)){
+            Log.d(TAG, "Debug visible");
+            findViewById(R.id.upperLeftArm).setVisibility(View.VISIBLE);
+            findViewById(R.id.lowerLeftArm).setVisibility(View.VISIBLE);
+            findViewById(R.id.upperRightArm).setVisibility(View.VISIBLE);
+            findViewById(R.id.lowerRightArm).setVisibility(View.VISIBLE);
+            findViewById(R.id.body).setVisibility(View.VISIBLE);
+        }else{
+            Log.d(TAG, "Debug invisible");
+            findViewById(R.id.upperLeftArm).setVisibility(View.INVISIBLE);
+            findViewById(R.id.lowerLeftArm).setVisibility(View.INVISIBLE);
+            findViewById(R.id.upperRightArm).setVisibility(View.INVISIBLE);
+            findViewById(R.id.lowerRightArm).setVisibility(View.INVISIBLE);
+            findViewById(R.id.body).setVisibility(View.INVISIBLE);
+        }
+    }
+
     public void showPopup(View v){
         PopupMenu popupMenu = new PopupMenu(this, v);
         MenuInflater mInf = popupMenu.getMenuInflater();
         mInf.inflate(R.menu.window_content, popupMenu.getMenu());
         popupMenu.show();
+    }
+
+    public void playFile(String filename){
+        Snackbar.make(findViewById(R.id.texture_view), "Opend File: " + filename, Snackbar.LENGTH_LONG).show();
+        ConnectThread.live = false;
+        player = new FilePlayer(this, filename);
+        Thread play = new Thread(player);
+        play.start();
+    }
+
+    public void onPlayPressed(View view){
+        player.togglePlay();
+    }
+
+    public void onNextPressed(View view){
+        player.nextFrame();
+    }
+
+    public void onPreviousPressed(View view){
+        player.previousFrame();
+    }
+
+    public void onLivePressed(View view){
+        ConnectThread.live = true;
     }
 }
