@@ -33,7 +33,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,6 +74,23 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         mTextureView = findViewById(R.id.texture_view);
+
+        ((SeekBar)findViewById(R.id.seekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d(TAG, "Prgress: " + progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         mTextureView.setOnTouchListener(new View.OnTouchListener() {
             private float firstDown = 0f;
@@ -262,13 +281,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
         connectThread.sendString("C");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        connectThread.sendString("c");
-        Toast.makeText(this, "Calibration done", Toast.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.texture_view), "Calibration done", Toast.LENGTH_SHORT).show();
     }
 
     @Override

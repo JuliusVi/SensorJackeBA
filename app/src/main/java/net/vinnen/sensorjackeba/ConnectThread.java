@@ -112,7 +112,23 @@ public class ConnectThread extends Thread {
                         e.printStackTrace();
                     }
                     while (!(line = bRead.readLine()).startsWith("w")) {
-                        Log.d(TAG, line);
+                        //Log.d(TAG, line);
+                        long lastTime = 0;
+                        long firstTime = 0;
+                        if(line.startsWith("m")){
+                            String[] parts = line.split(",");
+                            long timestamp = Long.parseLong(parts[1]);
+                            long timeInFile = Long.parseLong(parts[2]);
+                            long startTime = timestamp - timeInFile;
+                            f.renameTo(new File(dataDir, "jacketData_" + startTime));
+                        }
+                        if(line.startsWith("m") || line.startsWith("C") || line == null || line == ""){
+                            if(firstTime == 0){
+                                firstTime = Long.parseLong(line.split(",")[1]);
+                            }
+                            lastTime = Long.parseLong(line.split(",")[1]);
+                        }
+
                         bw.write(line);
                         bw.write("\n");
                     }
