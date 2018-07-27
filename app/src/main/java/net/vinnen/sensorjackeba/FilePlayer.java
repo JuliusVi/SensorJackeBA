@@ -3,6 +3,7 @@ package net.vinnen.sensorjackeba;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,6 +32,7 @@ public class FilePlayer implements Runnable{
 
     public FilePlayer(MainActivity main, String filename){
         this.main = main;
+        endMillis = Long.parseLong(filename.split("_")[2]);
         file = new File(dataDir, filename);
         try {
             FileInputStream inSt = new FileInputStream(file);
@@ -66,11 +68,12 @@ public class FilePlayer implements Runnable{
             if (playing) {
                 lastMillis = currentMillis;
                 currentMillis = System.currentTimeMillis();
+                setProgressBar(passedMillis);
                 passedMillis = passedMillis + (currentMillis-lastMillis);
                 String line = null;
                 try {
                     line = bRead.readLine();
-                    Log.d(TAG, "Line from File: " + line);
+                    //Log.d(TAG, "Line from File: " + line);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -111,6 +114,11 @@ public class FilePlayer implements Runnable{
         }
     }
 
+    public void setProgressBar(Long current){
+        double prog = ((double)current/(double)endMillis)*1000;
+        Log.d(TAG, "Progress: " + prog + " End: " + endMillis + " Current: " + current);
+        ((SeekBar)main.findViewById(R.id.seekBar)).setProgress((int)prog);
+    }
 
     public boolean isPlaying() {
         return playing;

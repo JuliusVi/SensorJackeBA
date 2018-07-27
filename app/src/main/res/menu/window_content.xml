@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/threeDRepresentation"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/threeDRepresentation"
         android:title="3D"
+        app:showAsAction="never"
+        android:orderInCategory="100"
         />
-    <item android:id="@+id/XYRepresentation"
+    <item
+        android:id="@+id/XYRepresentation"
         android:title="XY"
+        app:showAsAction="never"
+        android:orderInCategory="100"
         />
-    <item android:id="@+id/XZRepresentation"
+    <item
+        android:id="@+id/XZRepresentation"
         android:title="XZ"
-        /><item android:id="@+id/YZRepresentation"
-    android:title="YZ"
+        app:showAsAction="never"
+        android:orderInCategory="100"
+        />
+    <item
+        android:id="@+id/YZRepresentation"
+        android:title="YZ"
+        app:showAsAction="never"
+        android:orderInCategory="100"
     />
 </menu>

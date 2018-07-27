@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES20;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity
     public static final String TAG = "ConnectThread";
     private FilePlayer player;
 
+    int mode = 0;
+
     public ArmSegment uLA = new ArmSegment(0.15f,1.6f,-0.1f,0.065f,0.3f,0.065f,0,0,-90);
     public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,-0.1f,0.065f,0.3f,0.065f ,0, 0, 0);
 
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity
         ((SeekBar)findViewById(R.id.seekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                player.jumpToPercentage(progress);
                 Log.d(TAG, "Prgress: " + progress);
             }
 
@@ -193,8 +197,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        //getMenuInflater().inflate(R.menu.main, menu);
+        return false;
     }
 
     @Override
@@ -211,6 +215,8 @@ public class MainActivity extends AppCompatActivity
             openSettingsActivity.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
             startActivity(openSettingsActivity);
             return true;
+        } else if(id == R.id.XYRepresentation){
+            Log.d(TAG, "XYo");
         }
 
         return super.onOptionsItemSelected(item);
@@ -286,42 +292,65 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.d(TAG, "Surface Texture available");
+        //3D Mode
+        if(mode == 0) {
+            rendererThread = new RendererThread(surface, this);
+            rendererThread.start();
 
+            GLES20.glViewport(0, 0, width, height);
 
-        rendererThread = new RendererThread(surface, this);
-        rendererThread.start();
-
-        GLES20.glViewport(0, 0, width, height);
-
-        float ratio = (float) width / height;
-
-        // this projection matrix is applied to object coordinates
-        // in the onDrawFrame() method
-        Matrix.frustumM(rendererThread.mProjectionMatrix, 0, -ratio, ratio, -1, 1, 0.8f, 3);
-
-        //pic = mTextureView.lockCanvas();
-        //pic.drawCircle(50,50,50, green);
-        //mTextureView.unlockCanvasAndPost(pic);
+            float ratio = (float) width / height;
+            // this projection matrix is applied to object coordinates
+            // in the onDrawFrame() method
+            Matrix.frustumM(rendererThread.mProjectionMatrix, 0, -ratio, ratio, -1, 1, 0.8f, 3);
+        }
+        //2D Mode
+        else {
+            pic = mTextureView.lockCanvas();
+            pic.drawCircle(50,50,50,new Paint(Color.GREEN));
+            mTextureView.unlockCanvasAndPost(pic);
+        }
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
 
-
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        rendererThread.isStopped = true;
-        //mCamera.stopPreview();
-        //mCamera.release();
+        surface.release();
+        if(rendererThread!=null) {
+            rendererThread.isStopped = true;
+        }
         return false;
     }
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        //pic.drawCircle(0,0,1, green);
-        //mTextureView.unlockCanvasAndPost(pic);
+        if(mode != 0) {
+            surface.release();
+            rendererThread = null;
+            //mTextureView = null;
+            //mTextureView = findViewById(R.id.texture_view);
+            mTextureView.setSurfaceTextureListener(this);
+            pic = mTextureView.lockCanvas();
+            if(pic == null){
+                Log.d(TAG, "Pic is null");
+            }
+            Paint red = new Paint();
+            red.setColor(Color.RED);
+            red.setStrokeWidth(10);
+
+            Paint white = new Paint();
+            white.setColor(Color.WHITE);
+            white.setStrokeWidth(10);
+            pic.drawRect(new Rect(pic.getWidth() / 2 - 3, pic.getHeight(), pic.getWidth() / 2 + 3, 0), white);
+            pic.drawRect(new Rect(0, pic.getHeight() / 2 + 3, pic.getWidth(), pic.getHeight() / 2 - 3), white);
+            pic.drawCircle(pic.getWidth() / 2, pic.getHeight() / 2, 10, red);
+            mTextureView.unlockCanvasAndPost(pic);
+        }
     }
 
     @Override
@@ -349,6 +378,26 @@ public class MainActivity extends AppCompatActivity
         PopupMenu popupMenu = new PopupMenu(this, v);
         MenuInflater mInf = popupMenu.getMenuInflater();
         mInf.inflate(R.menu.window_content, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.threeDRepresentation) {
+                    mode = 0;
+                    Log.d(TAG, "3D");
+                } else if(id == R.id.XYRepresentation){
+                    mode = 1;
+                    Log.d(TAG, "XYo");
+                } else if(id == R.id.XZRepresentation){
+                    mode = 2;
+                    Log.d(TAG, "XZo");
+                } else if(id == R.id.YZRepresentation){
+                    mode = 3;
+                    Log.d(TAG, "YZo");
+                }
+                return false;
+            }
+        });
         popupMenu.show();
     }
 
@@ -374,5 +423,12 @@ public class MainActivity extends AppCompatActivity
 
     public void onLivePressed(View view){
         ConnectThread.live = true;
+    }
+
+    public void onSettingsPressed(View view){
+        Intent openSettingsActivity = new Intent(this, SettingsActivity.class);
+        openSettingsActivity.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+        openSettingsActivity.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
+        startActivity(openSettingsActivity);
     }
 }

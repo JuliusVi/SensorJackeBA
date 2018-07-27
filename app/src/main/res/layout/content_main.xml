@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp" />
         <SeekBar
-            android:max = "100"
+            android:max = "1000"
             android:min="0"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

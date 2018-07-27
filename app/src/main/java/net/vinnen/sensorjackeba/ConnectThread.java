@@ -27,6 +27,9 @@ public class ConnectThread extends Thread {
     private final BluetoothDevice mmDevice;
     private final String TAG = "ConnectThread";
 
+    long startTime = 0;
+    long lastTime = 0;
+
     File dataDir = new File(Environment.getExternalStorageDirectory(), "trackerJacketData");
     BufferedWriter bWrite;
 
@@ -113,25 +116,19 @@ public class ConnectThread extends Thread {
                     }
                     while (!(line = bRead.readLine()).startsWith("w")) {
                         //Log.d(TAG, line);
-                        long lastTime = 0;
-                        long firstTime = 0;
                         if(line.startsWith("m")){
                             String[] parts = line.split(",");
                             long timestamp = Long.parseLong(parts[1]);
                             long timeInFile = Long.parseLong(parts[2]);
-                            long startTime = timestamp - timeInFile;
-                            f.renameTo(new File(dataDir, "jacketData_" + startTime));
+                            startTime = timestamp - timeInFile;
                         }
-                        if(line.startsWith("m") || line.startsWith("C") || line == null || line == ""){
-                            if(firstTime == 0){
-                                firstTime = Long.parseLong(line.split(",")[1]);
-                            }
+                        if(!(line.startsWith("m") || line.startsWith("C") || line == null || line == "")){
                             lastTime = Long.parseLong(line.split(",")[1]);
                         }
-
                         bw.write(line);
                         bw.write("\n");
                     }
+                    f.renameTo(new File(dataDir, "jacketData_" + startTime + "_" + lastTime));
                     Log.d(TAG, "File transmitted");
                     bw.flush();
                     bw.close();
