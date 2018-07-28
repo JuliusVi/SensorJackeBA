@@ -13,10 +13,21 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextureView
-            android:id="@+id/texture_view"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="wrap_content">
+            <TextureView
+                android:id="@+id/texture_view"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:visibility="visible"/>
+
+            <TextureView
+                android:id="@+id/texture_view2D"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:visibility="invisible"/>
+        </RelativeLayout>
         <SeekBar
             android:max = "1000"
             android:min="0"

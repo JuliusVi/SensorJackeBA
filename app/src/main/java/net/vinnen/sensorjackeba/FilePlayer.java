@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * Created by Julius on 25.07.2018.
@@ -19,6 +20,10 @@ import java.io.InputStreamReader;
 public class FilePlayer implements Runnable{
     private final static String TAG = "FilePlayer";
     private MainActivity main;
+
+    private int currentIndex = 0;
+    private int maxIndex = 0;
+
     private long lastMillis;
     private long currentMillis;
     private long passedMillis;
@@ -26,7 +31,9 @@ public class FilePlayer implements Runnable{
     private boolean playing=false;
     private boolean active = true;
     private File file;
+    private double progressPercentage = 0;
     BufferedReader bRead = null;
+    private ArrayList<String> fileContent;
 
     File dataDir = new File(Environment.getExternalStorageDirectory(), "trackerJacketData");
 
@@ -41,6 +48,21 @@ public class FilePlayer implements Runnable{
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        fileContent = new ArrayList<String>();
+        String line = "";
+        do {
+            try {
+                line = bRead.readLine();
+                if(line != null && line != "") {
+                    fileContent.add(line);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            Log.d(TAG, "Line to Memory: " + line);
+        }while(line != null && line != "");
+        maxIndex = fileContent.size()-1;
+        Log.d(TAG, "File moved to Memory");
     }
     public void togglePlay(){
         if (playing) {
@@ -53,7 +75,10 @@ public class FilePlayer implements Runnable{
         }
     }
     public void jumpToPercentage(int percent){
-
+        if((int)progressPercentage != percent) {
+            currentIndex = (maxIndex / 1000) * percent;
+            //passedMillis = Long.parseLong(fileContent.get(currentIndex).split(";")[1]);
+        }
     }
     public void nextFrame(){
 
@@ -70,13 +95,9 @@ public class FilePlayer implements Runnable{
                 currentMillis = System.currentTimeMillis();
                 setProgressBar(passedMillis);
                 passedMillis = passedMillis + (currentMillis-lastMillis);
-                String line = null;
-                try {
-                    line = bRead.readLine();
-                    //Log.d(TAG, "Line from File: " + line);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                String line = fileContent.get(currentIndex);
+                    Log.d(TAG, "Line from Filerun: " + line);
+
                 if(line == null || line == ""){
                     Log.d(TAG, "Line was empty");
                     playing = false;
@@ -97,7 +118,6 @@ public class FilePlayer implements Runnable{
                         currentMillis = System.currentTimeMillis();
                         passedMillis = passedMillis + (currentMillis-lastMillis);
                     }
-                    //Log.d(TAG, line);
                     for (int i = 2; i < 5; i++) {
                         int glob = multi * 4 + (i - 1);
                         main.valuesToDisplay[glob] = parts[i];
@@ -110,14 +130,15 @@ public class FilePlayer implements Runnable{
                     });
 
                 }
+                currentIndex++;
             }
         }
     }
 
     public void setProgressBar(Long current){
-        double prog = ((double)current/(double)endMillis)*1000;
-        Log.d(TAG, "Progress: " + prog + " End: " + endMillis + " Current: " + current);
-        ((SeekBar)main.findViewById(R.id.seekBar)).setProgress((int)prog);
+        progressPercentage = ((double)current/(double)endMillis)*1000;
+        //Log.d(TAG, "Progress: " + progressPercentage + " End: " + endMillis + " Current: " + current);
+        ((SeekBar)main.findViewById(R.id.seekBar)).setProgress((int)progressPercentage);
     }
 
     public boolean isPlaying() {

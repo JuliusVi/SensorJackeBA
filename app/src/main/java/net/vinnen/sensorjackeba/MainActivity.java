@@ -43,10 +43,12 @@ import android.widget.Toast;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TextureView.SurfaceTextureListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
-    public static final String TAG = "ConnectThread";
+    public static final String TAG = "MainActivity";
     private FilePlayer player;
+    private SurfaceTextureListener3D surfaceTextureListener3D;
+    private SurfaceTextureListener2D surfaceTextureListener2D;
 
     int mode = 0;
 
@@ -57,10 +59,9 @@ public class MainActivity extends AppCompatActivity
     public ArmSegment lRA = new ArmSegment(0,0,0,0.065f,0.3f,0.065f,0,0,0);
 
     private TextureView mTextureView;
-    Canvas pic;
+    private TextureView textureView2D;
 
     ConnectThread connectThread;
-    RendererThread rendererThread;
     String targetName = "TrackerJacket";
 
     ConstraintLayout[] cl = new ConstraintLayout[5];
@@ -76,13 +77,33 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String fileToPlay = getIntent().getStringExtra("PlayFile");
+        Log.d(TAG, "Playing File: " + fileToPlay);
+        if(fileToPlay != null && fileToPlay != ""){
+            playFile(fileToPlay);
+        }
+
+        //Stuff for Looks
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         mTextureView = findViewById(R.id.texture_view);
+        textureView2D = findViewById(R.id.texture_view2D);
 
         ((SeekBar)findViewById(R.id.seekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 player.jumpToPercentage(progress);
-                Log.d(TAG, "Prgress: " + progress);
+                Log.d(TAG, "Progress: " + progress);
             }
 
             @Override
@@ -96,6 +117,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        surfaceTextureListener3D = new SurfaceTextureListener3D(this);
+        mTextureView.setSurfaceTextureListener(surfaceTextureListener3D);
+
+        surfaceTextureListener2D = new SurfaceTextureListener2D(this, textureView2D);
+        textureView2D.setSurfaceTextureListener(surfaceTextureListener2D);
+
         mTextureView.setOnTouchListener(new View.OnTouchListener() {
             private float firstDown = 0f;
             @Override
@@ -104,13 +131,11 @@ public class MainActivity extends AppCompatActivity
                     firstDown = event.getAxisValue(0);
                     return true;
                 }
-                rendererThread.rota = (event.getAxisValue(0)-firstDown)/2;
+                surfaceTextureListener3D.getRendererThread().rota = (event.getAxisValue(0)-firstDown)/2;
                 //Log.d(TAG,"Scroll: " + (event.getAxisValue(0)-firstDown));
                 return true;
             }
         });
-
-        mTextureView.setSurfaceTextureListener(this);
 
         final Button reqDownload = (Button)findViewById(R.id.reqDownloadBtn);
         reqDownload.setOnClickListener(new View.OnClickListener() {
@@ -164,24 +189,6 @@ public class MainActivity extends AppCompatActivity
         }
         connectThread = new ConnectThread(targetDevice, this);
         connectThread.start();
-
-        //Stuff for Looks
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        String fileToPlay = getIntent().getStringExtra("PlayFile");
-        if(fileToPlay != null && fileToPlay != ""){
-            playFile(fileToPlay);
-        }
     }
 
     @Override
@@ -291,69 +298,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.d(TAG, "Surface Texture available");
-        //3D Mode
-        if(mode == 0) {
-            rendererThread = new RendererThread(surface, this);
-            rendererThread.start();
-
-            GLES20.glViewport(0, 0, width, height);
-
-            float ratio = (float) width / height;
-            // this projection matrix is applied to object coordinates
-            // in the onDrawFrame() method
-            Matrix.frustumM(rendererThread.mProjectionMatrix, 0, -ratio, ratio, -1, 1, 0.8f, 3);
-        }
-        //2D Mode
-        else {
-            pic = mTextureView.lockCanvas();
-            pic.drawCircle(50,50,50,new Paint(Color.GREEN));
-            mTextureView.unlockCanvasAndPost(pic);
-        }
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        surface.release();
-        if(rendererThread!=null) {
-            rendererThread.isStopped = true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        if(mode != 0) {
-            surface.release();
-            rendererThread = null;
-            //mTextureView = null;
-            //mTextureView = findViewById(R.id.texture_view);
-            mTextureView.setSurfaceTextureListener(this);
-            pic = mTextureView.lockCanvas();
-            if(pic == null){
-                Log.d(TAG, "Pic is null");
-            }
-            Paint red = new Paint();
-            red.setColor(Color.RED);
-            red.setStrokeWidth(10);
-
-            Paint white = new Paint();
-            white.setColor(Color.WHITE);
-            white.setStrokeWidth(10);
-            pic.drawRect(new Rect(pic.getWidth() / 2 - 3, pic.getHeight(), pic.getWidth() / 2 + 3, 0), white);
-            pic.drawRect(new Rect(0, pic.getHeight() / 2 + 3, pic.getWidth(), pic.getHeight() / 2 - 3), white);
-            pic.drawCircle(pic.getWidth() / 2, pic.getHeight() / 2, 10, red);
-            mTextureView.unlockCanvasAndPost(pic);
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
@@ -383,15 +327,23 @@ public class MainActivity extends AppCompatActivity
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.threeDRepresentation) {
+                    mTextureView.setVisibility(View.VISIBLE);
+                    textureView2D.setVisibility(View.INVISIBLE);
                     mode = 0;
                     Log.d(TAG, "3D");
                 } else if(id == R.id.XYRepresentation){
+                    mTextureView.setVisibility(View.INVISIBLE);
+                    textureView2D.setVisibility(View.VISIBLE);
                     mode = 1;
                     Log.d(TAG, "XYo");
                 } else if(id == R.id.XZRepresentation){
+                    mTextureView.setVisibility(View.INVISIBLE);
+                    textureView2D.setVisibility(View.VISIBLE);
                     mode = 2;
                     Log.d(TAG, "XZo");
                 } else if(id == R.id.YZRepresentation){
+                    mTextureView.setVisibility(View.INVISIBLE);
+                    textureView2D.setVisibility(View.VISIBLE);
                     mode = 3;
                     Log.d(TAG, "YZo");
                 }
