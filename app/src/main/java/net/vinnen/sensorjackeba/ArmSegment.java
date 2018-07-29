@@ -109,4 +109,10 @@ public class ArmSegment {
         vecY = (float) (x*(Math.cos(yaw)*Math.sin(pitch)*Math.sin(roll)- Math.sin(yaw)*Math.cos(roll)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.sin(roll)+ Math.cos(yaw)*Math.cos(roll)) + z*(Math.cos(pitch)*Math.sin(roll)));
         vecZ = (float) (x*(Math.cos(yaw)*Math.sin(pitch)*Math.cos(roll)+ Math.sin(yaw)*Math.sin(roll)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.cos(roll)- Math.cos(yaw)*Math.sin(roll)) + z*(Math.cos(pitch)*Math.cos(roll)));
     }
+
+    public void setPosXYZ(float x, float y, float z){
+        posX = x;
+        posY = y;
+        posZ = z;
+    }
 }

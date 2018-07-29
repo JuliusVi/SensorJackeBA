@@ -7,6 +7,9 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import java.nio.Buffer;
+import java.nio.IntBuffer;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -96,6 +99,7 @@ public class RendererThread extends Thread {
         //this.body = new Cube();
 
         while (!isStopped && egl.eglGetError() == EGL_SUCCESS) {
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
             egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
             rota = rota % 360;
             xFin = (float)(1 * Math.cos(Math.toRadians(rota)) - 1 * Math.sin(Math.toRadians(rota)));
@@ -130,12 +134,18 @@ public class RendererThread extends Thread {
             mainActivity.uRA.getEndpoint();
             cube.draw(mMVPMatrix, mainActivity.uRA.endX, mainActivity.uRA.endY, mainActivity.uRA.endZ,
                     0.065f,0.30f,0.065f,mainActivity.lRA.rotX,mainActivity.lRA.rotY,mainActivity.lRA.rotZ);
+            mainActivity.lRA.setPosXYZ(mainActivity.uRA.endX, mainActivity.uRA.endY, mainActivity.uRA.endZ);
+            mainActivity.lRA.getEndpoint();
+            cube.draw(mMVPMatrix,mainActivity.lRA.endX, mainActivity.lRA.endY, mainActivity.lRA.endZ,0.2f,0.2f,0.2f,0,0,0);
 
             //LeftArm
             cube.draw(mMVPMatrix,mainActivity.uLA);
             mainActivity.uLA.getEndpoint();
             cube.draw(mMVPMatrix, mainActivity.uLA.endX, mainActivity.uLA.endY, mainActivity.uLA.endZ,
                     0.065f,0.30f,0.065f,mainActivity.lLA.rotX,mainActivity.lLA.rotY,mainActivity.lLA.rotZ);
+            mainActivity.lLA.setPosXYZ(mainActivity.uLA.endX, mainActivity.uLA.endY, mainActivity.uLA.endZ);
+            mainActivity.lLA.getEndpoint();
+            cube.draw(mMVPMatrix,mainActivity.lLA.endX, mainActivity.lLA.endY, mainActivity.lLA.endZ,0.2f,0.2f,0.2f,0,0,0);
 
             egl.eglSwapBuffers(eglDisplay, eglSurface);
             try {

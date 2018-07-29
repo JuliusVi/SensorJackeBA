@@ -31,7 +31,7 @@ public class FilePlayer implements Runnable{
     private boolean playing=false;
     private boolean active = true;
     private File file;
-    private double progressPercentage = 0;
+    private int progressPercentage = 0;
     BufferedReader bRead = null;
     private ArrayList<String> fileContent;
 
@@ -65,19 +65,39 @@ public class FilePlayer implements Runnable{
         Log.d(TAG, "File moved to Memory");
     }
     public void togglePlay(){
-        if (playing) {
-            playing = false;
-            ((ImageButton)main.findViewById(R.id.play)).setImageResource(R.drawable.ic_play_arrow_black_24dp);
-        }else {
-            currentMillis = System.currentTimeMillis();
-            playing = true;
-            ((ImageButton)main.findViewById(R.id.play)).setImageResource(R.drawable.ic_pause_black_24dp);
-        }
+        main.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (playing) {
+                    playing = false;
+                    ((ImageButton)main.findViewById(R.id.play)).setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                }else {
+                    currentMillis = System.currentTimeMillis();
+                    playing = true;
+                    ((ImageButton)main.findViewById(R.id.play)).setImageResource(R.drawable.ic_pause_black_24dp);
+                }
+            }
+        });
     }
     public void jumpToPercentage(int percent){
-        if((int)progressPercentage != percent) {
+        Log.d(TAG, "Percent: " + percent);
+        Log.d(TAG, "ProgPercent: " + progressPercentage);
+        if(percent < (progressPercentage-5) || percent > (progressPercentage+5)) {
+            playing = false;
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "Jumping in File");
+            Log.d(TAG, "CurrentIndex: " + currentIndex);
             currentIndex = (maxIndex / 1000) * percent;
-            //passedMillis = Long.parseLong(fileContent.get(currentIndex).split(";")[1]);
+            Log.d(TAG, "NewCurrentIndex: " + currentIndex);
+            passedMillis = Long.parseLong(fileContent.get(currentIndex).split(",")[1]);
+            Log.d(TAG, "passedMillis" + passedMillis);
+            currentMillis = System.currentTimeMillis();
+            playing = true;
+            //currentMillis
         }
     }
     public void nextFrame(){
@@ -96,7 +116,7 @@ public class FilePlayer implements Runnable{
                 setProgressBar(passedMillis);
                 passedMillis = passedMillis + (currentMillis-lastMillis);
                 String line = fileContent.get(currentIndex);
-                    Log.d(TAG, "Line from Filerun: " + line);
+                    //Log.d(TAG, "Line from Filerun: " + line);
 
                 if(line == null || line == ""){
                     Log.d(TAG, "Line was empty");
@@ -130,13 +150,17 @@ public class FilePlayer implements Runnable{
                     });
 
                 }
-                currentIndex++;
+                if(currentIndex < maxIndex) {
+                    currentIndex++;
+                } else{
+                    togglePlay();
+                }
             }
         }
     }
 
     public void setProgressBar(Long current){
-        progressPercentage = ((double)current/(double)endMillis)*1000;
+        progressPercentage = (int)(((double)current/(double)endMillis)*1000);
         //Log.d(TAG, "Progress: " + progressPercentage + " End: " + endMillis + " Current: " + current);
         ((SeekBar)main.findViewById(R.id.seekBar)).setProgress((int)progressPercentage);
     }
