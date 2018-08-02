@@ -67,7 +67,7 @@ public class ArmSegment {
 
         rotateVector(vecX,vecY,vecZ, "Z", rotZ);
         rotateVector(vecX,vecY,vecZ, "Y", rotY);
-        //rotateAllAchses(vecX,vecY,vecZ,rotY,rotX,rotZ);
+        //rotateAllAchses(vecY,vecX,vecZ,rotY,rotZ,rotX);
 
         endX = posX + vecX;
         endY = posY + vecY;

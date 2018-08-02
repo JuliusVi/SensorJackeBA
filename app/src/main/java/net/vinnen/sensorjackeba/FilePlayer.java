@@ -80,8 +80,8 @@ public class FilePlayer implements Runnable{
         });
     }
     public void jumpToPercentage(int percent){
-        Log.d(TAG, "Percent: " + percent);
-        Log.d(TAG, "ProgPercent: " + progressPercentage);
+        //Log.d(TAG, "Percent: " + percent);
+        //Log.d(TAG, "ProgPercent: " + progressPercentage);
         if(percent < (progressPercentage-5) || percent > (progressPercentage+5)) {
             playing = false;
             try {

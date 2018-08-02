@@ -33,15 +33,15 @@ public class ConnectThread extends Thread {
     File dataDir = new File(Environment.getExternalStorageDirectory(), "trackerJacketData");
     BufferedWriter bWrite;
 
-    private MainActivity context;
+    private MainActivity main;
     char x = 'y';
 
-    public ConnectThread(BluetoothDevice device, MainActivity context) {
+    public ConnectThread(BluetoothDevice device, MainActivity main) {
         // Use a temporary object that is later assigned to mmSocket
         // because mmSocket is final.
         BluetoothSocket tmp = null;
         mmDevice = device;
-        this.context = context;
+        this.main = main;
 
         try {
             // Get a BluetoothSocket to connect with the given BluetoothDevice.
@@ -64,7 +64,7 @@ public class ConnectThread extends Thread {
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             Log.e(TAG,"Could not establish connection",connectException);
-            Snackbar.make(context.findViewById(R.id.texture_view), "Connection failed", Snackbar.LENGTH_LONG)
+            Snackbar.make(main.findViewById(R.id.texture_view), "Connection failed", Snackbar.LENGTH_LONG)
                     .setAction("Bluetooth Settings", null).show();
             try {
                 mmSocket.close();
@@ -132,19 +132,23 @@ public class ConnectThread extends Thread {
                     Log.d(TAG, "File transmitted");
                     bw.flush();
                     bw.close();
-                }else {
+                }else if(line.startsWith("B")){
+                    Log.d(TAG, "Button pressed");
+                }else if(line.startsWith("b")){
+                    Log.d(TAG, "Button released");
+                }else{
                     if(live) {
                         final String[] parts = line.split(",");
                         int multi = Integer.parseInt(parts[0]);
                         //Log.d(TAG, line);
                         for (int i = 2; i < 5; i++) {
                             int glob = multi * 4 + (i - 1);
-                            context.valuesToDisplay[glob] = parts[i];
+                            main.valuesToDisplay[glob] = parts[i];
                         }
-                        context.runOnUiThread(new Runnable() {
+                        main.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                context.updateDisplay();
+                                main.updateDisplay();
                             }
                         });
                     }
@@ -187,4 +191,6 @@ public class ConnectThread extends Thread {
     public void downloadFile(String fileNumber){
         sendString("r/output_" + fileNumber + ".txts");
     }
+
+
 }

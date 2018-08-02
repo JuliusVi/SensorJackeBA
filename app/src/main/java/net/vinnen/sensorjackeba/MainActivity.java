@@ -50,13 +50,11 @@ public class MainActivity extends AppCompatActivity
     private SurfaceTextureListener3D surfaceTextureListener3D;
     private SurfaceTextureListener2D surfaceTextureListener2D;
 
-    int mode = 0;
+    public ArmSegment uLA = new ArmSegment(0.15f,1.6f,-0.1f,0.065f,0.28f,0.065f,0,0,0);
+    public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,-0.1f,0.065f,0.28f,0.065f ,0, 0, 0);
 
-    public ArmSegment uLA = new ArmSegment(0.15f,1.6f,-0.1f,0.065f,0.3f,0.065f,0,0,-90);
-    public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,-0.1f,0.065f,0.3f,0.065f ,0, 0, 0);
-
-    public ArmSegment lLA = new ArmSegment(0,0,0,0.065f,0.3f,0.065f,0,0,0);
-    public ArmSegment lRA = new ArmSegment(0,0,0,0.065f,0.3f,0.065f,0,0,0);
+    public ArmSegment lLA = new ArmSegment(0,0,0,0.065f,0.26f,0.065f,0,0,0);
+    public ArmSegment lRA = new ArmSegment(0,0,0,0.065f,0.26f,0.065f,0,0,0);
 
     private TextureView mTextureView;
     private TextureView textureView2D;
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 player.jumpToPercentage(progress);
-                Log.d(TAG, "Progress: " + progress);
+                //Log.d(TAG, "Progress: " + progress);
             }
 
             @Override
@@ -222,8 +220,6 @@ public class MainActivity extends AppCompatActivity
             openSettingsActivity.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
             startActivity(openSettingsActivity);
             return true;
-        } else if(id == R.id.XYRepresentation){
-            Log.d(TAG, "XYo");
         }
 
         return super.onOptionsItemSelected(item);
@@ -329,22 +325,21 @@ public class MainActivity extends AppCompatActivity
                 if (id == R.id.threeDRepresentation) {
                     mTextureView.setVisibility(View.VISIBLE);
                     textureView2D.setVisibility(View.INVISIBLE);
-                    mode = 0;
                     Log.d(TAG, "3D");
                 } else if(id == R.id.XYRepresentation){
                     mTextureView.setVisibility(View.INVISIBLE);
                     textureView2D.setVisibility(View.VISIBLE);
-                    mode = 1;
+                    surfaceTextureListener2D.setMode(0);
                     Log.d(TAG, "XYo");
                 } else if(id == R.id.XZRepresentation){
                     mTextureView.setVisibility(View.INVISIBLE);
                     textureView2D.setVisibility(View.VISIBLE);
-                    mode = 2;
+                    surfaceTextureListener2D.setMode(1);
                     Log.d(TAG, "XZo");
                 } else if(id == R.id.YZRepresentation){
                     mTextureView.setVisibility(View.INVISIBLE);
                     textureView2D.setVisibility(View.VISIBLE);
-                    mode = 3;
+                    surfaceTextureListener2D.setMode(2);
                     Log.d(TAG, "YZo");
                 }
                 return false;
