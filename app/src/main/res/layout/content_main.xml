@@ -93,6 +93,12 @@
             android:text="Calibrate Jacket"
             android:onClick="calibrateJacket"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/actionBtn"
+            android:text="Gesture" />
+
         <include android:id = "@+id/body" layout="@layout/content_row"
             android:visibility="invisible"/>
         <include android:id = "@+id/upperLeftArm" layout="@layout/content_row"

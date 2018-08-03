@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity
     private FilePlayer player;
     private SurfaceTextureListener3D surfaceTextureListener3D;
     private SurfaceTextureListener2D surfaceTextureListener2D;
+    private float gsx, gsy, gsz = 0;
 
     public ArmSegment uLA = new ArmSegment(0.15f,1.6f,-0.1f,0.065f,0.28f,0.065f,0,0,0);
     public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,-0.1f,0.065f,0.28f,0.065f ,0, 0, 0);
@@ -112,6 +113,19 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+
+        Button actionBtn = findViewById(R.id.actionBtn);
+        actionBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    startGesture();
+                }else if(event.getAction() == MotionEvent.ACTION_UP){
+                    endGesture();
+                }
+                return true;
             }
         });
 
@@ -377,5 +391,16 @@ public class MainActivity extends AppCompatActivity
         openSettingsActivity.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
         openSettingsActivity.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
         startActivity(openSettingsActivity);
+    }
+
+    public void startGesture(){
+        gsx = lRA.endX;
+        gsy = lRA.endY;
+        gsz = lRA.endZ;
+        Log.d(TAG, "Gesture started");
+    }
+    public void endGesture(){
+        Log.d(TAG, "Gesture end");
+        Log.d(TAG, "deltaX: " + (gsx - lRA.endX) + "deltaY: " + (gsy - lRA.endY) + "deltaZ: " + (gsz - lRA.endZ));
     }
 }

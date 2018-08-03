@@ -136,7 +136,7 @@ public class RendererThread extends Thread {
                     0.065f,0.30f,0.065f,mainActivity.lRA.rotX,mainActivity.lRA.rotY,mainActivity.lRA.rotZ);
             mainActivity.lRA.setPosXYZ(mainActivity.uRA.endX, mainActivity.uRA.endY, mainActivity.uRA.endZ);
             mainActivity.lRA.getEndpoint();
-            cube.draw(mMVPMatrix,mainActivity.lRA.endX, mainActivity.lRA.endY, mainActivity.lRA.endZ,0.2f,0.2f,0.2f,0,0,0);
+            //cube.draw(mMVPMatrix,mainActivity.lRA.endX, mainActivity.lRA.endY, mainActivity.lRA.endZ,0.2f,0.2f,0.2f,0,0,0);
 
             //LeftArm
             cube.draw(mMVPMatrix,mainActivity.uLA);
@@ -145,7 +145,7 @@ public class RendererThread extends Thread {
                     0.065f,0.30f,0.065f,mainActivity.lLA.rotX,mainActivity.lLA.rotY,mainActivity.lLA.rotZ);
             mainActivity.lLA.setPosXYZ(mainActivity.uLA.endX, mainActivity.uLA.endY, mainActivity.uLA.endZ);
             mainActivity.lLA.getEndpoint();
-            cube.draw(mMVPMatrix,mainActivity.lLA.endX, mainActivity.lLA.endY, mainActivity.lLA.endZ,0.2f,0.2f,0.2f,0,0,0);
+            //cube.draw(mMVPMatrix,mainActivity.lLA.endX, mainActivity.lLA.endY, mainActivity.lLA.endZ,0.2f,0.2f,0.2f,0,0,0);
 
             egl.eglSwapBuffers(eglDisplay, eglSurface);
             try {
