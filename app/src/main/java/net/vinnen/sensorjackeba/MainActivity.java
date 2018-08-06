@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity
     private SurfaceTextureListener2D surfaceTextureListener2D;
     private float gsx, gsy, gsz = 0;
 
-    public ArmSegment uLA = new ArmSegment(0.15f,1.6f,-0.1f,0.065f,0.28f,0.065f,0,0,0);
-    public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,-0.1f,0.065f,0.28f,0.065f ,0, 0, 0);
+    public ArmSegment uLA = new ArmSegment(0.15f,1.6f,0,0.065f,0.28f,0.065f,0,0,0);
+    public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,0,0.065f,0.28f,0.065f ,0, 0, 0);
 
     public ArmSegment lLA = new ArmSegment(0,0,0,0.065f,0.26f,0.065f,0,0,0);
     public ArmSegment lRA = new ArmSegment(0,0,0,0.065f,0.26f,0.065f,0,0,0);
@@ -400,6 +400,24 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "Gesture started");
     }
     public void endGesture(){
+        float deltaX = gsx - lRA.endX;
+        float deltaY = gsy - lRA.endY;
+        float deltaZ = gsz - lRA.endZ;
+        String gestureResult = "No Gesture detected";
+        if(deltaX > 0.2){
+            gestureResult = "Swipe Right detected";
+        }else if(deltaX < -0.2){
+            gestureResult = "Swipe Left detected";
+        }else if(deltaY > 0.2){
+            gestureResult = "Swipe Up detected";
+        }else if(deltaY < -0.2){
+            gestureResult = "Swipe Down detected";
+        }else if(deltaZ > 0.2){
+            gestureResult = "Swipe Forward detected";
+        }else if(deltaZ < -0.2){
+            gestureResult = "Swipe Backward detected";
+        }
+        Snackbar.make(findViewById(R.id.texture_view), gestureResult, Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Gesture end");
         Log.d(TAG, "deltaX: " + (gsx - lRA.endX) + "deltaY: " + (gsy - lRA.endY) + "deltaZ: " + (gsz - lRA.endZ));
     }
