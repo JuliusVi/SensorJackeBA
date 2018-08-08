@@ -85,7 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/reqDownloadBtn"
-            android:text="Datei Laden"/>
+            android:text="Download File"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

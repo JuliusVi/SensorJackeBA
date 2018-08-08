@@ -18,7 +18,7 @@ public class DownloadDialog {
         context = con;
         thread=t;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Title");
+        builder.setTitle("Download File");
         // Set up the input
         final EditText input = new EditText(context);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
@@ -26,7 +26,7 @@ public class DownloadDialog {
         builder.setView(input);
 
         // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Download", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();

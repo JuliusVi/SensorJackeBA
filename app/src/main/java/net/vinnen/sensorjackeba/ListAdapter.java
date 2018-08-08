@@ -48,8 +48,12 @@ public class ListAdapter extends BaseAdapter {
         View vi = convertView;
         if (vi == null)
             vi = inflater.inflate(R.layout.row, null);
-        TextView text = (TextView) vi.findViewById(R.id.text);
-        text.setText(data[position]);
+        TextView filename = (TextView) vi.findViewById(R.id.filename);
+        filename.setText(data[position].split("_")[0]);
+        TextView timestamp = (TextView) vi.findViewById(R.id.timestamp);
+        timestamp.setText(data[position].split("_")[1] + "    ");
+        TextView filelenght = (TextView) vi.findViewById(R.id.filelength);
+        filelenght.setText(data[position].split("_")[2]);
         return vi;
     }
 }

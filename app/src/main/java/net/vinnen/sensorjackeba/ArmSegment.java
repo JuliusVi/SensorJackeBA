@@ -41,8 +41,8 @@ public class ArmSegment {
 
     public void getEndpoint(){
         //Reset
-        vecX = 0;
-        vecY = dimY;
+        vecX = dimY;
+        vecY = 0;//dimY;
         vecZ = 0;
 
         /*
@@ -65,12 +65,12 @@ public class ArmSegment {
         //Roll des Vektors ist egal
         //rotateVector(vecX,vecY, vecZ, "X", rotX);
 
-        rotateVector(vecX,vecY,vecZ, "Z", rotZ);
-        rotateVector(vecX,vecY,vecZ, "Y", rotY);
-        //rotateAllAchses(vecY,vecX,vecZ,rotY,rotZ,rotX);
+        //rotateVector(vecX,vecY,vecZ, "Z", rotZ);
+        //rotateVector(vecX,vecY,vecZ, "Y", rotY);
+        rotateAllAchses(vecX,vecY,vecZ,rotX,rotY,rotZ);
 
-        endX = posX + vecX;
-        endY = posY + vecY;
+        endX = posX + vecY;
+        endY = posY + vecX;
         endZ = posZ + vecZ;
     }
 
@@ -102,7 +102,7 @@ public class ArmSegment {
     public void rotateAllAchses(double x, double y, double z, double yawDeg, double pitchDeg ,double rollDeg){
         double yaw, pitch, roll;
         yaw = Math.toRadians(yawDeg);
-        pitch = Math.toRadians(pitchDeg);
+        pitch = Math.toRadians(pitchDeg-90);
         roll = Math.toRadians(rollDeg);
 
         vecX = (float) (x*(Math.cos(yaw)*Math.cos(pitch)) + y*(Math.sin(yaw)*Math.cos(pitch)) - z*(Math.sin(pitch)));

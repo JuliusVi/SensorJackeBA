@@ -55,7 +55,8 @@ public class SurfaceTextureListener2D implements TextureView.SurfaceTextureListe
         this.z = (int)(mainActivity.lRA.endZ*100);
         Log.d(TAG, "X: " + x + " Y: " + y + " Z: " + z);
         pic = textureView.lockCanvas();
-        pic.drawRGB(0,0,0);
+        //pic.drawRGB(0, 0,0);
+        pic.drawColor(-1);
         if(pic == null){
             Log.d(TAG, "Pic is null");
         }
@@ -63,11 +64,11 @@ public class SurfaceTextureListener2D implements TextureView.SurfaceTextureListe
         red.setColor(Color.RED);
         red.setStrokeWidth(10);
 
-        Paint white = new Paint();
-        white.setColor(Color.WHITE);
-        white.setStrokeWidth(10);
-        pic.drawRect(new Rect(pic.getWidth() / 2 - 3, pic.getHeight(), pic.getWidth() / 2 + 3, 0), white);
-        pic.drawRect(new Rect(0, pic.getHeight() / 2 + 3, pic.getWidth(), pic.getHeight() / 2 - 3), white);
+        Paint black = new Paint();
+        black.setColor(Color.BLACK);
+        black.setStrokeWidth(10);
+        pic.drawRect(new Rect(pic.getWidth() / 2 - 3, pic.getHeight(), pic.getWidth() / 2 + 3, 0), black);
+        pic.drawRect(new Rect(0, pic.getHeight() / 2 + 3, pic.getWidth(), pic.getHeight() / 2 - 3), black);
         if(mode == 0){
             pic.drawCircle((pic.getWidth() / 2) + x, (pic.getHeight() / 2) + y, 10, red);
         } else if(mode == 1){
