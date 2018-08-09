@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         lRA.rotX = (float)values[2];
-        lRA.rotY = (float) (360 - (values[1] - valuesOffset[1]));
+        lRA.rotY = (float) (360 - (values[1] - valuesOffset[1])); //90 = 180orig
         lRA.rotZ = (float) (180 - (values[3]+90));
         //Log.d(TAG, "Val: " + (values[1] - valuesOffset[1]));
 
@@ -409,13 +409,13 @@ public class MainActivity extends AppCompatActivity
         }else if(deltaX < -0.2){
             gestureResult = "Swipe Left detected";
         }else if(deltaY > 0.2){
-            gestureResult = "Swipe Up detected";
-        }else if(deltaY < -0.2){
             gestureResult = "Swipe Down detected";
+        }else if(deltaY < -0.2){
+            gestureResult = "Swipe Up detected";
         }else if(deltaZ > 0.2){
-            gestureResult = "Swipe Forward detected";
-        }else if(deltaZ < -0.2){
             gestureResult = "Swipe Backward detected";
+        }else if(deltaZ < -0.2){
+            gestureResult = "Swipe Forward detected";
         }
         Snackbar.make(findViewById(R.id.texture_view), gestureResult, Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Gesture end");

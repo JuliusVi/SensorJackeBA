@@ -1,5 +1,7 @@
 package net.vinnen.sensorjackeba;
 
+import android.util.Log;
+
 /**
  * Created by Julius on 25.06.2018.
  */
@@ -31,8 +33,8 @@ public class ArmSegment {
     public float rotY;
     public float rotZ;
 
-    public float vecX = 0;
-    public float vecY = dimY;
+    public float vecX = dimY;
+    public float vecY = 0;//dimY;
     public float vecZ = 0;
 
     public float endX = 0;
@@ -42,7 +44,7 @@ public class ArmSegment {
     public void getEndpoint(){
         //Reset
         vecX = dimY;
-        vecY = 0;//dimY;
+        vecY = 0;
         vecZ = 0;
 
         /*
@@ -67,11 +69,13 @@ public class ArmSegment {
 
         //rotateVector(vecX,vecY,vecZ, "Z", rotZ);
         //rotateVector(vecX,vecY,vecZ, "Y", rotY);
-        rotateAllAchses(vecX,vecY,vecZ,rotX,rotY,rotZ);
-
-        endX = posX + vecY;
-        endY = posY + vecX;
-        endZ = posZ + vecZ;
+        //Log.d("Tst", "Rotx: " + rotX + "Roty: " + rotY + "Rotz: " + rotZ);
+        //Log.d("Tstbf", "VecX: " + vecX + "Vecy: " + vecY + "Vecz: " + vecZ);
+        rotateAllAchses(vecX,vecY,vecZ, rotY, rotZ-90, rotX);//rotY-90, -rotZ, 90);
+        //Log.d("Tst", "VecX: " + vecX + "Vecy: " + vecY + "Vecz: " + vecZ);
+        endX = posX - vecX;
+        endY = posY + vecZ;
+        endZ = posZ + vecY;
     }
 
     public void rotateVector(double x, double y, double z, String axis, double deg){
@@ -102,12 +106,17 @@ public class ArmSegment {
     public void rotateAllAchses(double x, double y, double z, double yawDeg, double pitchDeg ,double rollDeg){
         double yaw, pitch, roll;
         yaw = Math.toRadians(yawDeg);
-        pitch = Math.toRadians(pitchDeg-90);
+        pitch = Math.toRadians(pitchDeg);
         roll = Math.toRadians(rollDeg);
 
+        /*
         vecX = (float) (x*(Math.cos(yaw)*Math.cos(pitch)) + y*(Math.sin(yaw)*Math.cos(pitch)) - z*(Math.sin(pitch)));
         vecY = (float) (x*(Math.cos(yaw)*Math.sin(pitch)*Math.sin(roll)- Math.sin(yaw)*Math.cos(roll)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.sin(roll)+ Math.cos(yaw)*Math.cos(roll)) + z*(Math.cos(pitch)*Math.sin(roll)));
         vecZ = (float) (x*(Math.cos(yaw)*Math.sin(pitch)*Math.cos(roll)+ Math.sin(yaw)*Math.sin(roll)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.cos(roll)- Math.cos(yaw)*Math.sin(roll)) + z*(Math.cos(pitch)*Math.cos(roll)));
+    */
+        vecX = (float) (x*(Math.cos(yaw)*Math.cos(pitch)) + y*(Math.cos(yaw)*Math.sin(pitch)*Math.sin(roll)- Math.sin(yaw)*Math.cos(roll)) + z*((Math.cos(yaw)*Math.sin(pitch)*Math.cos(roll)+ Math.sin(yaw)*Math.sin(roll))));
+        vecY = (float) (x*(Math.sin(yaw)*Math.cos(pitch)) + y*(Math.sin(yaw)*Math.sin(pitch)*Math.sin(roll)+ Math.cos(yaw)*Math.cos(roll)) + z*(Math.sin(yaw)*Math.sin(pitch)*Math.cos(roll)- Math.cos(yaw)*Math.sin(roll)));
+        vecZ = (float) (x*(-Math.sin(pitch)) + y*(Math.cos(pitch)*Math.sin(roll)) + z*(Math.cos(pitch)*Math.cos(roll)));
     }
 
     public void setPosXYZ(float x, float y, float z){
