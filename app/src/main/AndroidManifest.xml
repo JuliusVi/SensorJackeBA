@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -39,7 +39,7 @@
                 android:value="net.vinnen.sensorjackeba.MainActivity" />
         </activity>
         <activity
-            android:name=".SelectFile"
+            android:name=".activities.SelectFile"
             android:label="@string/title_activity_select_file"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">

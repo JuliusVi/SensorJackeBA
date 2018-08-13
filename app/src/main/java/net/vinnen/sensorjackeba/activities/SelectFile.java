@@ -1,20 +1,23 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import net.vinnen.sensorjackeba.ListAdapter;
+import net.vinnen.sensorjackeba.MainActivity;
+import net.vinnen.sensorjackeba.R;
+
 import java.io.File;
 
+/**
+ * This class displays all downloaded files that can be played in the Main Activity
+ */
 public class SelectFile extends AppCompatActivity {
 
     ListView listview;
@@ -38,7 +41,6 @@ public class SelectFile extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.putExtra("PlayFile", filename);
                 navigateUpToFromChild(SelectFile.this, intent);
-                //NavUtils.navigateUpFromSameTask(SelectFile.this);
             }
         });
     }

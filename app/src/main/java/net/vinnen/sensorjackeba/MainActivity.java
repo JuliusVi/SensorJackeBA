@@ -4,21 +4,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
-import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -34,14 +23,25 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.vinnen.sensorjackeba.activities.SelectFile;
+import net.vinnen.sensorjackeba.activities.SettingsActivity;
+import net.vinnen.sensorjackeba.model.ArmSegment;
+import net.vinnen.sensorjackeba.thread.ConnectThread;
+import net.vinnen.sensorjackeba.thread.SurfaceTextureListener2D;
+import net.vinnen.sensorjackeba.thread.SurfaceTextureListener3D;
+
 import java.util.Set;
 
+/**
+ * @Author Julius Vinnen
+ *
+ * This class is the main Activity for the app. All sorts of data that has to be displayed or otherwise used here
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     private SurfaceTextureListener2D surfaceTextureListener2D;
     private float gsx, gsy, gsz = 0;
 
+    //generate the ArmSegment model classes
     public ArmSegment uLA = new ArmSegment(0.15f,1.6f,0,0.065f,0.28f,0.065f,0,0,0);
     public ArmSegment uRA = new ArmSegment(-0.15f,1.6f,0,0.065f,0.28f,0.065f ,0, 0, 0);
 
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 player.jumpToPercentage(progress);
-                //Log.d(TAG, "Progress: " + progress);
             }
 
             @Override
@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity
         valuesToDisplay[4] = "UpRight:";
         valuesToDisplay[0] = "LowRight:";
 
+        //Get Bluetooth connection here. Code from: https://developer.android.com/guide/topics/connectivity/bluetooth
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device doesn't support Bluetooth
@@ -184,6 +185,9 @@ public class MainActivity extends AppCompatActivity
         }
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         BluetoothDevice targetDevice = null;
+
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+        targetName = p.getString("device_name", "TrackerJacket");
 
         Log.d(TAG, "Host Device Name: " + targetName);
 
@@ -215,8 +219,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.main, menu);
         return false;
     }
 
@@ -253,15 +255,15 @@ public class MainActivity extends AppCompatActivity
             startActivity(openFilesActivity);
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
 
-    //myStuff
-
+    /**
+     * This Method is called by the connect thread, to update the Values to be displayed
+     */
     public void updateDisplay(){
         for (int i = 0; i < valuesToDisplay.length; i++) {
             if(i%4 != 0){
@@ -278,22 +280,23 @@ public class MainActivity extends AppCompatActivity
                 tv[i].setText(String.valueOf(values[i]).split("\\.")[0]);//valuesToDisplay[i]);
             }
         }
+        double bodyRotation = values[17] - valuesOffset[17];
 
         lRA.rotX = (float)values[2];
-        lRA.rotY = (float) (360 - (values[1] - valuesOffset[1])); //90 = 180orig
+        lRA.rotY = (float) (360 - (values[1] - valuesOffset[1] - bodyRotation));
         lRA.rotZ = (float) (180 - (values[3]+90));
         //Log.d(TAG, "Val: " + (values[1] - valuesOffset[1]));
 
         uRA.rotX = (float)values[6];
-        uRA.rotY = (float) (360 - (values[5] - valuesOffset[5]));
+        uRA.rotY = (float) (360 - (values[5] - valuesOffset[5] - bodyRotation));
         uRA.rotZ = (float) (180 - (values[7]+90));
 
         lLA.rotX = (float)values[10];
-        lLA.rotY = (float) (180 - (values[9] - valuesOffset[9]));
+        lLA.rotY = (float) (180 - (values[9] - valuesOffset[9] - bodyRotation));
         lLA.rotZ = (float) (180 - (values[11]+90));
 
         uLA.rotX = (float)values[14];
-        uLA.rotY = (float) (180 - (values[13] - valuesOffset[13]));
+        uLA.rotY = (float) (180 - (values[13] - valuesOffset[13] - bodyRotation));
         uLA.rotZ = (float) (180 - (values[15]+90));
     }
 
@@ -309,6 +312,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+        //Show/hide Raw Values
         super.onResume();
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
         if(p.getBoolean("show_debug", true)){
@@ -394,15 +398,34 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startGesture(){
-        gsx = lRA.endX;
-        gsy = lRA.endY;
-        gsz = lRA.endZ;
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!p.getBoolean("left_handed", false)) {
+            gsx = lRA.endX;
+            gsy = lRA.endY;
+            gsz = lRA.endZ;
+        }
+        else{
+            gsx = lLA.endX;
+            gsy = lLA.endY;
+            gsz = lLA.endZ;
+        }
         Log.d(TAG, "Gesture started");
     }
     public void endGesture(){
-        float deltaX = gsx - lRA.endX;
-        float deltaY = gsy - lRA.endY;
-        float deltaZ = gsz - lRA.endZ;
+        float deltaX = 0;
+        float deltaY = 0;
+        float deltaZ = 0;
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!p.getBoolean("left_handed", false)) {
+            deltaX = gsx - lRA.endX;
+            deltaY = gsy - lRA.endY;
+            deltaZ = gsz - lRA.endZ;
+        }
+        else{
+            deltaX = gsx - lLA.endX;
+            deltaY = gsy - lLA.endY;
+            deltaZ = gsz - lLA.endZ;
+        }
         String gestureResult = "No Gesture detected";
         if(deltaX > 0.2){
             gestureResult = "Swipe Right detected";

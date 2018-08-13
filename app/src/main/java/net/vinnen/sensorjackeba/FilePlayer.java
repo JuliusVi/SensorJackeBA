@@ -17,6 +17,9 @@ import java.util.ArrayList;
  * Created by Julius on 25.07.2018.
  */
 
+/**
+ * This class provides all Methods to play a File in the Main window.
+ */
 public class FilePlayer implements Runnable{
     private final static String TAG = "FilePlayer";
     private MainActivity main;
@@ -89,22 +92,22 @@ public class FilePlayer implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            Log.d(TAG, "Jumping in File");
-            Log.d(TAG, "CurrentIndex: " + currentIndex);
+            //Log.d(TAG, "Jumping in File");
+            //Log.d(TAG, "CurrentIndex: " + currentIndex);
             currentIndex = (maxIndex / 1000) * percent;
-            Log.d(TAG, "NewCurrentIndex: " + currentIndex);
+            //Log.d(TAG, "NewCurrentIndex: " + currentIndex);
             passedMillis = Long.parseLong(fileContent.get(currentIndex).split(",")[1]);
-            Log.d(TAG, "passedMillis" + passedMillis);
+            //Log.d(TAG, "passedMillis" + passedMillis);
             currentMillis = System.currentTimeMillis();
             playing = true;
             //currentMillis
         }
     }
     public void nextFrame(){
-
+        jumpToPercentage(progressPercentage+10);
     }
     public void previousFrame(){
-
+        jumpToPercentage(progressPercentage-10);
     }
 
     @Override

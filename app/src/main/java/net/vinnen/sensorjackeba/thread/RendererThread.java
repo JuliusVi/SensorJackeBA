@@ -1,4 +1,4 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.thread;
 
 
 import android.graphics.SurfaceTexture;
@@ -7,8 +7,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import java.nio.Buffer;
-import java.nio.IntBuffer;
+import net.vinnen.sensorjackeba.MainActivity;
+import net.vinnen.sensorjackeba.model.Cube;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -33,6 +33,9 @@ import static javax.microedition.khronos.egl.EGL10.EGL_SUCCESS;
  * Created by Julius on 20.06.2018.
  */
 
+/**
+ * This class renders the Cubes to the display. Some passages from the Code are from: http://www.learnopengles.com/
+ */
 public class RendererThread extends Thread {
     // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
@@ -41,7 +44,7 @@ public class RendererThread extends Thread {
 
     boolean isStopped = false;
     private SurfaceTexture surface;
-    private  MainActivity mainActivity;
+    private MainActivity mainActivity;
     private Cube cube;
 
     public double rota = 0d; //Winkel
@@ -93,10 +96,6 @@ public class RendererThread extends Thread {
         GLES20.glEnable(GLES20.GL_CULL_FACE);
 
         this.cube = new Cube();
-        //this.lowerLeftArm = new Cube();
-        //this.upperRightArm = new Cube();
-        //this.lowerRightArm = new Cube();
-        //this.body = new Cube();
 
         while (!isStopped && egl.eglGetError() == EGL_SUCCESS) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
@@ -116,10 +115,6 @@ public class RendererThread extends Thread {
 
 
             //Legs
-            //lowerLeftArm.draw(mMVPMatrix,0.15f,0,0,0.08f,0.5f,0.08f,0,0,0);
-            //lowerRightArm.draw(mMVPMatrix,0.15f,0,0,0.08f,0.5f,0.08f,0,0,0);
-            //upperRightArm.draw(mMVPMatrix,0.15f,0,0,0.08f,0.5f,0.08f,0,0,0);
-            //body.draw(mMVPMatrix,0.15f,0,0,0.08f,0.5f,0.08f,0,0,0);
             cube.draw(mMVPMatrix,0.15f,0,0,0.08f,0.5f,0.08f,0,0,0);
             cube.draw(mMVPMatrix,-0.15f,0,0,0.08f,0.5f,0.08f,0,0,0);
             cube.draw(mMVPMatrix,0.15f,0.5f,0,0.08f,0.5f,0.08f,-15,0,8);

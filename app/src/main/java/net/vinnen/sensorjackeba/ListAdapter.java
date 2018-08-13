@@ -11,6 +11,9 @@ import android.widget.TextView;
  * Created by Julius on 18.07.2018.
  */
 
+/**
+ * This class is an adapter for the list to display files in file select activity
+ */
 public class ListAdapter extends BaseAdapter {
     Context context;
     String[] data;
@@ -44,7 +47,6 @@ public class ListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
         View vi = convertView;
         if (vi == null)
             vi = inflater.inflate(R.layout.row, null);

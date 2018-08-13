@@ -1,4 +1,4 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.activities;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

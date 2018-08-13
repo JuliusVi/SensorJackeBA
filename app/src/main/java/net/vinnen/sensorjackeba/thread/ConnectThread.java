@@ -1,10 +1,13 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.thread;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+
+import net.vinnen.sensorjackeba.MainActivity;
+import net.vinnen.sensorjackeba.R;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,8 +22,12 @@ import java.util.UUID;
 
 /**
  * Created by Julius on 13.06.2018.
+ * Passages of the Code are teaken from Android Guide for Bluetooth https://developer.android.com/guide/topics/connectivity/bluetooth
  */
 
+/**
+ * This class runs the Bluetooth connection to the ESP and handles the received data.
+ */
 public class ConnectThread extends Thread {
     public static boolean live = true;
     private final BluetoothSocket mmSocket;
@@ -37,14 +44,11 @@ public class ConnectThread extends Thread {
     char x = 'y';
 
     public ConnectThread(BluetoothDevice device, MainActivity main) {
-        // Use a temporary object that is later assigned to mmSocket
-        // because mmSocket is final.
         BluetoothSocket tmp = null;
         mmDevice = device;
         this.main = main;
 
         try {
-            // Get a BluetoothSocket to connect with the given BluetoothDevice.
             UUID tmpo = device.getUuids()[0].getUuid();
             tmp = device.createRfcommSocketToServiceRecord(tmpo);
         } catch (IOException e) {
@@ -54,18 +58,16 @@ public class ConnectThread extends Thread {
     }
 
     public void run() {
-        // Cancel discovery because it otherwise slows down the connection.
-        //mBluetoothAdapter.cancelDiscovery();
-
         try {
+            //This part is from the Android Guide
+            //from here
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception
             mmSocket.connect();
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             Log.e(TAG,"Could not establish connection",connectException);
-            Snackbar.make(main.findViewById(R.id.texture_view), "Connection failed", Snackbar.LENGTH_LONG)
-                    .setAction("Bluetooth Settings", null).show();
+            Snackbar.make(main.findViewById(R.id.texture_view), "Connection failed", Snackbar.LENGTH_LONG).show();
             try {
                 mmSocket.close();
             } catch (IOException closeException) {
@@ -74,6 +76,7 @@ public class ConnectThread extends Thread {
             return;
         }
         Log.d(TAG, "Connection sucessfull");
+        //to here
 
         // The connection attempt succeeded.
 

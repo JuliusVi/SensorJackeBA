@@ -1,8 +1,10 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.model;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
+
+import net.vinnen.sensorjackeba.thread.RendererThread;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Julius on 20.06.2018.
+ * Big Parts of this class are implemented, as described in http://www.learnopengles.com/
  */
 
 public class Cube {
@@ -133,18 +136,11 @@ public class Cube {
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(mProgram);
 
-        //Matrix.setIdentityM(modelMatrix, 0);
         Matrix.translateM(modelMatrix,0, posX, posY, posZ);
 
-        //Matrix.rotateM(modelMatrix, 0, rotX,1,0,0);
         Matrix.rotateM(modelMatrix,0,rotY, 0, 1, 0);
-        //Matrix.rotateM(modelMatrix,0,rotX, 1, 0, 0);
+
         Matrix.rotateM(modelMatrix,0,rotZ, 0, 0, 1);
-        //Matrix.rotateM(modelMatrix,0,rotX, 1, 0, 0);
-
-        //float[] rotation = {}
-
-        //Matrix.multiplyMM(modelMatrix,0,);
 
         Matrix.scaleM(modelMatrix,0, x, y, z);
 

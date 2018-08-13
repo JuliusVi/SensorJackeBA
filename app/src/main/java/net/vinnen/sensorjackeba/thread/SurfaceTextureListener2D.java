@@ -1,4 +1,4 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.thread;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,10 +8,15 @@ import android.graphics.SurfaceTexture;
 import android.util.Log;
 import android.view.TextureView;
 
+import net.vinnen.sensorjackeba.MainActivity;
+
 /**
  * Created by Julius on 28.07.2018.
  */
 
+/**
+ * This class implements the listener for the 2D hand position screen. It gets updated every frame.
+ */
 public class SurfaceTextureListener2D implements TextureView.SurfaceTextureListener {
 
     private final static String TAG = "TextureListener2D";
@@ -30,16 +35,10 @@ public class SurfaceTextureListener2D implements TextureView.SurfaceTextureListe
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         Log.d(TAG, "Surface Texture available");
-
-        //pic = textureView.lockCanvas();
-        //pic.drawCircle(50,50,50,new Paint(Color.GREEN));
-        //textureView.unlockCanvasAndPost(pic);
-
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
     }
 
     @Override
@@ -50,12 +49,11 @@ public class SurfaceTextureListener2D implements TextureView.SurfaceTextureListe
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        this.x = (int)(mainActivity.lRA.endX*100);
-        this.y = (int)(mainActivity.lRA.endY*100);
-        this.z = (int)(mainActivity.lRA.endZ*100);
+        this.x = (int)(-mainActivity.lRA.endX*200);
+        this.y = (int)(-mainActivity.lRA.endY*200)-160;
+        this.z = (int)(-mainActivity.lRA.endZ*200);
         Log.d(TAG, "X: " + x + " Y: " + y + " Z: " + z);
         pic = textureView.lockCanvas();
-        //pic.drawRGB(0, 0,0);
         pic.drawColor(-1);
         if(pic == null){
             Log.d(TAG, "Pic is null");
@@ -78,12 +76,6 @@ public class SurfaceTextureListener2D implements TextureView.SurfaceTextureListe
         }
 
         textureView.unlockCanvasAndPost(pic);
-    }
-
-    public void updateXYZ(int x, int y, int z){
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     public void setMode(int mode){

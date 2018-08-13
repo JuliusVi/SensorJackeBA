@@ -1,5 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fragment="net.vinnen.sensorjackeba.SettingsActivity$GeneralPreferenceFragment">
+    android:fragment="net.vinnen.sensorjackeba.activities.SettingsActivity$GeneralPreferenceFragment">
 
     <SwitchPreference
         android:defaultValue="true"
@@ -8,15 +8,15 @@
         android:title="Show debug Values" />
 
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="left_handed"
-        android:summary="Use your left hand for inputs in input mode"
+        android:summary="Use your left hand for Gesture inputs"
         android:title="Left Hand Mode" />
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
-        android:defaultValue="ESP32"
+        android:defaultValue="TrackerJacket"
         android:inputType="textCapWords"
         android:key="device_name"
         android:maxLines="1"

@@ -1,18 +1,20 @@
-package net.vinnen.sensorjackeba;
+package net.vinnen.sensorjackeba.thread;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 import android.view.TextureView;
 
+import net.vinnen.sensorjackeba.MainActivity;
+
 /**
  * Created by Julius on 28.07.2018.
  */
 
+/**
+ * This Class is the Base Listener for the 3D Display, the rendering itself is done in the rendererThread class
+ */
 public class SurfaceTextureListener3D implements TextureView.SurfaceTextureListener {
 
     private final static String TAG = "Texture3D";
